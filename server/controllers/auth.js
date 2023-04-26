@@ -79,8 +79,29 @@ export const login = async (req, res) => {
 //Get me
 export const getMe = async (req, res) => {
     try{
+        const user = await User.findById(req.userId)
 
+        if (!user) {
+            return res.json({
+                message: "Такого юзера не существует"
+            })
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+            },
+            process.env.JWT_SECRET,
+            {expiresIn: '30d'}
+        )
+
+        res.json({
+            user,
+            token
+        })
     } catch(error) {
-
+        res.json({
+            message: `Нет доступа. ${error}`
+        })
     }
 }
